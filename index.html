@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>トランペット工房物語</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>🎺 トランペット工房物語 🎺</h1>
+            <p>あなたは街一番のトランペット職人。美しい音色を奏でる楽器を作り上げましょう！</p>
+            <button class="btn help-btn" id="help-btn">❓ 遊び方</button>
+            <button class="btn debug-btn" id="debug-btn" style="display: none;">🔧 デバッグ情報</button>
+            <div class="audio-controls">
+                <label for="volume-slider">🔊 音量: </label>
+                <input type="range" id="volume-slider" min="0" max="100" value="30" style="margin: 0 10px;">
+                <span id="volume-display">30%</span>
+            </div>
+        </div>
+
+        <!-- チュートリアルモーダル -->
+        <div class="tutorial-modal" id="tutorial-modal">
+            <div class="tutorial-content">
+                <div class="tutorial-header">
+                    <h2>🎺 遊び方ガイド</h2>
+                    <button class="close-btn" id="close-tutorial">×</button>
+                </div>
+                <div class="tutorial-body">
+                    <div class="tutorial-step active" data-step="1">
+                        <h3>ステップ 1: 注文を選ぶ</h3>
+                        <p>右側の「📋 注文」から作りたいトランペットを選択しましょう。</p>
+                        <ul>
+                            <li>💰 報酬が高いほど稼げます</li>
+                            <li>⭐ 難易度が高いほど高品質な材料が必要</li>
+                            <li>📅 期限はありませんが、参考程度に</li>
+                        </ul>
+                    </div>
+                    <div class="tutorial-step" data-step="2">
+                        <h3>ステップ 2: 材料を確認・購入</h3>
+                        <p>下の「📦 材料倉庫」で必要な材料があるか確認しましょう。</p>
+                        <ul>
+                            <li>難易度1: 真鍮 + 革</li>
+                            <li>難易度2: 真鍮 + 革 + 銀</li>
+                            <li>難易度3: 真鍮 + 革 + 銀 + 金 + ベルベット</li>
+                        </ul>
+                        <p>足りない場合は「🛒 材料購入」ボタンで購入できます。</p>
+                    </div>
+                    <div class="tutorial-step" data-step="3">
+                        <h3>ステップ 3: 製作開始</h3>
+                        <p>左側の「🔨 工房」で「🔨 製作開始」ボタンを押しましょう。</p>
+                        <p>材料が自動的に消費され、音色調整ゲームが始まります。</p>
+                    </div>
+                    <div class="tutorial-step" data-step="4">
+                        <h3>ステップ 4: 音色調整ゲーム</h3>
+                        <p>「🎵 調律開始」を押して、表示された順序通りに音符をクリック！</p>
+                        <ul>
+                            <li>正解すると品質が上がります（報酬アップ！）</li>
+                            <li>間違えても進行はします</li>
+                            <li>何度でも挑戦できます</li>
+                        </ul>
+                    </div>
+                    <div class="tutorial-step" data-step="5">
+                        <h3>ステップ 5: 完成・納品</h3>
+                        <p>音色調整を3回成功させると「✨ 完成」ボタンが出現。</p>
+                        <p>クリックすると報酬を獲得し、評判が上がります！</p>
+                        <ul>
+                            <li>💰 所持金でより良い材料を購入</li>
+                            <li>⭐ 評判が上がると新しい注文が</li>
+                            <li>🔧 レベルアップで新機能解放</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="tutorial-nav">
+                    <button class="btn tutorial-btn" id="prev-step" style="display: none;">← 前へ</button>
+                    <span class="step-indicator" id="step-indicator">1 / 5</span>
+                    <button class="btn tutorial-btn" id="next-step">次へ →</button>
+                    <button class="btn tutorial-btn start-btn" id="start-game" style="display: none;">ゲームを始める</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ガイドハイライト -->
+        <div class="guide-highlight" id="guide-highlight"></div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="money">1000</div>
+                <div>💰 所持金</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="reputation">50</div>
+                <div>⭐ 評判</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="level">1</div>
+                <div>🔧 職人レベル</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="completed">0</div>
+                <div>✅ 完成数</div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="workshop">
+                <h2 class="section-title">🔨 工房</h2>
+
+                <div class="trumpet-display">
+                    <div class="trumpet" id="trumpet">🎺</div>
+                    <div id="trumpet-quality">品質: <span id="quality-value">普通</span></div>
+                </div>
+
+                <div class="music-game" id="music-game" style="display: none;">
+                    <h3>🎵 音色調整ゲーム</h3>
+                    <p>正しい順序で音階をクリックして、トランペットの音色を調整しましょう！</p>
+                    <div class="game-status" id="game-status">
+                        <p>🎯 進行度: <span id="progress-text">0/3</span> | 品質向上のチャンス!</p>
+                    </div>
+                    <div id="sequence-display"></div>
+                    <div class="notes-container" id="notes-container">
+                        <div class="note" data-note="C">ド</div>
+                        <div class="note" data-note="D">レ</div>
+                        <div class="note" data-note="E">ミ</div>
+                        <div class="note" data-note="F">ファ</div>
+                        <div class="note" data-note="G">ソ</div>
+                        <div class="note" data-note="A">ラ</div>
+                        <div class="note" data-note="B">シ</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <button class="btn" id="start-tuning">🎵 調律開始</button>
+                </div>
+
+                <button class="btn" id="start-crafting">🔨 製作開始</button>
+                <button class="btn" id="complete-trumpet" style="display: none;">✨ 完成</button>
+            </div>
+
+            <div class="orders">
+                <h2 class="section-title">📋 注文</h2>
+                <div class="help-text">
+                    <p>💡 注文をクリックして選択してから製作を始めましょう</p>
+                </div>
+                <div id="orders-list">
+                    <!-- 注文がここに表示される -->
+                </div>
+                <button class="btn" id="generate-order">🔄 新しい注文</button>
+            </div>
+        </div>
+
+        <div class="materials">
+            <h2 class="section-title">📦 材料倉庫</h2>
+            <div class="help-text">
+                <p>💡 難易度に応じて必要な材料が変わります。在庫を確認してから製作しましょう</p>
+            </div>
+            <div class="material-grid" id="materials-grid">
+                <!-- 材料がここに表示される -->
+            </div>
+            <button class="btn" id="buy-materials">🛒 材料購入</button>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <!-- デバッグパネル -->
+    <div class="debug-panel" id="debug-panel" style="display: none;">
+        <div class="debug-content">
+            <h3>🔧 デバッグ情報</h3>
+            <div id="debug-info">
+                <!-- デバッグ情報がここに表示される -->
+            </div>
+            <button class="btn" id="close-debug">閉じる</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
